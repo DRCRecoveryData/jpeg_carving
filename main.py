@@ -18,27 +18,27 @@ def carving(filename):
     print(str(jpg_count) + ' jpg file carving complete')
 
 #파일 데이터 읽어오기
-def file_read(f,file,f_size):
+def file_read(f, file, f_size):
     global jpg_count
 
     sec = f.read(f_size)
     hex_b = binascii.hexlify(sec)
-    #jpeg 파일 시그니처 검사
+    # jpeg 파일 시그니처 검사
 
-    if hex_b.find(b'ffd8ffe0') != -1:
-        offset_h = hex_b.find(b'ffd8ffe0')//2
-        offset_f = hex_b.rfind(b'ffd9')//2
+    if hex_b.find(b'ffd8ffe0') != -1 or hex_b.find(b'ffd8ffe1') != -1:
+        offset_h = min(filter(lambda x: x != -1, [hex_b.find(b'ffd8ffe0'), hex_b.find(b'ffd8ffe1')])) // 2
+        offset_f = hex_b.rfind(b'ffd9') // 2
         jpg_count += 1
         num = 2
         check = 0
-        #파일 이름 중복 제거
-        if os.path.isfile("Recovery/" + file.split('.')[0] + ".jpg") == True:
+        # 파일 이름 중복 제거
+        if os.path.isfile("Recovery/" + file.split('.')[0] + ".jpg"):
             while check == 0:
-                if os.path.isfile("Recovery/" + file.split('.')[0] +'('+str(num)+')'  + ".jpg") == False:
-                    output_file = open("Recovery/" + file.split('.')[0] +'('+str(num)+')' +".jpg", "wb")
+                if not os.path.isfile("Recovery/" + file.split('.')[0] + '(' + str(num) + ')' + ".jpg"):
+                    output_file = open("Recovery/" + file.split('.')[0] + '(' + str(num) + ')' + ".jpg", "wb")
                     check = 1
                 else:
-                    num+=1
+                    num += 1
         else:
             output_file = open("Recovery/" + file.split('.')[0] + ".jpg", "wb")
         f.seek(0)
